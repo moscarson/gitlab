@@ -1,0 +1,5 @@
+NOW=$(date +%Y-%m%d-%H%M)
+TMPFILE="/tmp/userdata.${NOW}"
+touch ${TMPFILE}
+echo "it is now ${NOW}" > ${TMPFILE}
+

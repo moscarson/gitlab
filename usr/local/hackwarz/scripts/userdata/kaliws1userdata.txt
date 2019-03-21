@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ROLE=kaliws1
+LOGDIR=/usr/local/hackwarz/logs
+
+mkdir -p ${LOGDIR}
+
+# Clean old shell history
+history -c
+

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+ROLE=REPLACEROLENAME
+BASEDIR=/root/hackwarz
+LOGDIR=${BASEDIR}/logs
+ARTIFACTSDIR=${BASEDIR}/artifacts
+SCRIPTSDIR=${BASEDIR}/scripts
+
+mkdir -p ${LOGDIR} ${SCRIPTSDIR} ${ARTIFACTSDIR}
+
+# Clean old shell history
+history -c
+
+# Clear old logs
+cat /dev/null > /var/log/yum.log
+
+# Disable choose_repo
+/sbin/chkconfig choose_repo off
+
+# Set host name
+echo "Setting host name"
+/bin/hostname ${ROLE}
+
+#change the host name permanently.
+echo "Updating /etc/sysconfig/network with host name"
+/bin/cat /etc/sysconfig/network | sed -s "s/HOSTNAME=.*/HOSTNAME=${ROLE}/g" > /etc/sysconfig/network.tmp
+/bin/mv /etc/sysconfig/network.tmp /etc/sysconfig/network
+
+# remove rm alias
+unalias rm
+# First remove all yum repo definitions
+for file in $(ls -1d /etc/yum.repos.d/*); do
+        rm $file
+done
+
+# Figure out repo name to be used
+case ${ROLE} in
+        fury )                         		REPODIR=rpms/centos7;;
+        vanko )                        		REPODIR=rpms/vanko;;
+        hulk | pepper | rhodes | romanoff )     REPODIR=rpms/centos511;;
+        jarvis )                                REPODIR=rpms/shellshock;;
+esac
+
+# Need to prep the repo directories on the server
+# ssh -i ./hackwarzAdmin.pem centos@34.192.172.134
+# createrepo /var/www/html/rpms/centos7
+# createrepo -s sha /var/www/html/rpms/centos511
+# Set up hackwarz repo
+echo -e "[hackwarz]\nname=hackwarz\nbaseurl=http://34.192.172.134/${REPODIR}\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/hackwarz.repo
+
+# Clean metadata
+yum clean metadata
+yum clean all
+
+# Alias yum to only use correct repo
+YUMCMD="yum --disablerepo=* --enablerepo=hackwarz -y"
+
+# Get installation artifacts
+# pepper and rhodes use the same archive file.  they are part of the voip solution
+if [[ $ROLE == "pepper" ]] || [[ $ROLE == "rhodes" ]] ; then
+        ARTIFACTS=hackwarz_artifacts_voip.tar
+else
+        ARTIFACTS=hackwarz_artifacts_${ROLE}.tar
+fi
+
+# Get to working directory
+cd ${BASEDIR}
+wget http://34.192.172.134/artifacts/${ARTIFACTS}
+tar xvf ${ARTIFACTS}
+
+# Get installation script
+SCRIPTNAME=hackwarz_install_${ROLE}.sh
+wget http://34.192.172.134/artifacts/${SCRIPTNAME}
+
+# run installation script
+chmod 700 ${BASEDIR}/${SCRIPTNAME}
+${BASEDIR}/${SCRIPTNAME}
+
+# add entry to fury's host table
+if [[ $ROLE == "fury" ]] ; then
+	echo "REPLACEKILLIANIP win2003host" >> /etc/hosts
+fi
+
+# clean up 
+################ rm -rf /root/hackwarz
+
+
+

@@ -1,0 +1,53 @@
+
+gitlab meeting with Forge scrum team
+
+So far I have
+
+	reviewed documentation on how to install in AWS
+	
+	booted up Ubuntu ami that is used in that document. 
+	
+		gitlab baked in to it
+		log in to it and looked at basic config of gitlab
+		
+to do full deploy
+
+	domain name for the Gitlab instance - not needed.  will just use IPs
+	
+		
+Direction from Mr. Berry
+
+	8 March:  we are authorized to start up research on Gitlab in AWS
+				if cost more than $500 per month, need to inform him
+				stand up a replacement for SWF
+				
+				then migrate PF capability to it		
+
+		
+**************				
+technical discussion
+**************
+DB and app have to be on separate systems
+
+Kristy has document on how to install all on single server
+
+gitlab has its own CAC authentication built in
+
+Ben research CAC authentication within gitlab load balancer	product			
+				
+Ben has an email specific for gitlab
+
+	registration email for govcloud instance 
+	
+need to use Postgres 9.6
+
+use containers.  do not use Openshift
+
+	
+**************
+Mike find hackwarz scripts to deploy of VPC automatically
+
+do not put stuff on SWF yet about gitlab
+	do I need to delete my repo??
+	
+				
