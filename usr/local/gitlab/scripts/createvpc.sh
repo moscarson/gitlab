@@ -62,7 +62,6 @@ PUBROUTEASSOC=`aws ec2 associate-route-table  --subnet-id ${PUBSUBNETID} --route
 PRIVROUTEASSOC=`aws ec2 associate-route-table  --subnet-id ${PRIVSUBNETID} --route-table-id ${PRIVROUTETABLEID}`		
 
 readonly PUBLICSG=$(aws ec2 create-security-group --group-name publicsg${VPCNAME} --description "publicsg${VPCNAME}" --vpc-id ${VPCID})
-readonly PUBLICSG=$(echo $PUBLICSG|awk -F\" '{print $4}')
 aws ec2 authorize-security-group-ingress --group-id ${PUBLICSG} --protocol tcp  --port 0-65535 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id ${PUBLICSG} --protocol udp  --port 0-65535 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id ${PUBLICSG} --protocol icmp --port all      --cidr 0.0.0.0/0
